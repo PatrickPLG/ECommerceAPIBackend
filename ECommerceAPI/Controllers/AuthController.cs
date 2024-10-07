@@ -1,0 +1,96 @@
+﻿using ECommerceAPI.Models;
+using ECommerceAPI.Repositories;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
+
+namespace ECommerceAPI.Controllers
+{
+    [Route("api/auth")]
+    [ApiController]
+    public class AuthController : ControllerBase
+    {
+        private readonly UserRepository _userRepository;
+        private readonly IConfiguration _configuration;
+
+        public AuthController(UserRepository userRepository, IConfiguration configuration)
+        {
+            _userRepository = userRepository;
+            _configuration = configuration;
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] LoginModel registerModel)
+        {
+            if (await _userRepository.GetUserByUsername(registerModel.Username) != null)
+                return BadRequest("User already exists");
+
+            CreatePasswordHash(registerModel.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            var user = new User
+            {
+                Username = registerModel.Username,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt
+            };
+
+            await _userRepository.AddUser(user);
+            return Ok("User registered");
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
+        {
+            var user = await _userRepository.GetUserByUsername(loginModel.Username);
+            if (user == null || !VerifyPasswordHash(loginModel.Password, user.PasswordHash, user.PasswordSalt))
+                return Unauthorized("Invalid credentials");
+
+            var token = GenerateJwtToken(user.Username);
+            return Ok(new { token });
+        }
+
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+            }
+        }
+
+        private bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
+        {
+            using (var hmac = new HMACSHA512(storedSalt))
+            {
+                var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return computedHash.SequenceEqual(storedHash);
+            }
+        }
+
+        private string GenerateJwtToken(string username)
+        {
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Name, username)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddHours(1),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+    }
+}

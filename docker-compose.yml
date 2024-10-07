@@ -1,0 +1,31 @@
+version: '3.4'
+
+services:
+  ecommerceapi:
+    image: ${DOCKER_REGISTRY-}ecommerceapi
+    build:
+      context: .
+      dockerfile: ECommerceAPI/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=database;Port=5432;Database=myappdb;User Id=myappuser;Password=mypassword;
+    depends_on:
+      - database
+
+  database:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: myappdb
+      POSTGRES_USER: myappuser
+      POSTGRES_PASSWORD: mypassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
