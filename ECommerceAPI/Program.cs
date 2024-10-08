@@ -7,6 +7,10 @@ using ECommerceAPI.Extensions;
 using ECommerceAPI.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
+// Access configuration variables
+var jwtKey = builder.Configuration["Jwt:Key"];
+var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+var jwtAudience = builder.Configuration["Jwt:Audience"];
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -31,9 +35,9 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = "https://localhost:8081",
-        ValidAudience = "https://localhost:5173",
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("MYSUPERSECRETLONGKEYNOONEWILLEVERGUESS123456789"))
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtAudience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
 });
 
