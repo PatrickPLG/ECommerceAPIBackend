@@ -20,6 +20,12 @@ namespace ECommerceAPI.Models
         public string ImageUrl { get; set; }
 
         [Required]
-        public int Category { get; set; }
+        public string Category { get; set; }
+
+        [Required]
+        public double Rating { get; set; }
+
+        [Required]
+        public int Rating_count { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using ECommerceAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerceAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241008162317_Product")]
+    partial class Product
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,9 +32,8 @@ namespace ECommerceAPI.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Category")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -44,8 +46,8 @@ namespace ECommerceAPI.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
-                    b.Property<double>("Rating")
-                        .HasColumnType("double precision");
+                    b.Property<decimal>("Rating")
+                        .HasColumnType("numeric");
 
                     b.Property<int>("Rating_count")
                         .HasColumnType("integer");
@@ -57,41 +59,6 @@ namespace ECommerceAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Products");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Category = "men's clothing",
-                            Description = "Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday",
-                            ImageUrl = "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
-                            Price = 109.95m,
-                            Rating = 3.8999999999999999,
-                            Rating_count = 120,
-                            Title = "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Category = "men's clothing",
-                            Description = "Slim-fitting style, contrast raglan long sleeve, three-button henley placket, lightweight & soft fabric for breathable and comfortable wearing...",
-                            ImageUrl = "https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg",
-                            Price = 22.30m,
-                            Rating = 4.0999999999999996,
-                            Rating_count = 259,
-                            Title = "Mens Casual Premium Slim Fit T-Shirts"
-                        },
-                        new
-                        {
-                            Id = 20,
-                            Category = "women's clothing",
-                            Description = "95% Cotton, 5% Spandex; Features: Casual, Short Sleeve, Letter Print, V-Neck, Fashion Tees. The fabric is soft and has some stretch...",
-                            ImageUrl = "https://fakestoreapi.com/img/61pHAEJ4NML._AC_UX679_.jpg",
-                            Price = 12.99m,
-                            Rating = 3.6000000000000001,
-                            Rating_count = 145,
-                            Title = "DANVOUY Women T Shirt Casual Cotton Short"
-                        });
                 });
 
             modelBuilder.Entity("ECommerceAPI.Models.User", b =>
