@@ -50,8 +50,22 @@ namespace ECommerceAPI.Controllers
             if (user == null || !VerifyPasswordHash(loginModel.Password, user.PasswordHash, user.PasswordSalt))
                 return Unauthorized("Invalid credentials");
 
+            // Generate claims
+            Claim[] claims = new[]
+            {
+                new Claim(ClaimTypes.Name, user.Username)
+            };
             var token = GenerateJwtToken(user.Username);
             return Ok(new { token });
+        }
+
+        [HttpGet("user")]
+        [Authorize]
+        public async Task<IActionResult> GetUser()
+        {
+            var username = User.Identity.Name;
+            var user = await _userRepository.GetUserByUsername(username);
+            return Ok(user);
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
