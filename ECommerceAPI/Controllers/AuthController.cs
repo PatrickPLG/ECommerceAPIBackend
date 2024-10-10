@@ -65,7 +65,7 @@ namespace ECommerceAPI.Controllers
         {
             var username = User.Identity.Name;
             var user = await _userRepository.GetUserByUsername(username);
-            return Ok(user);
+            return Ok(user.Username);
         }
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
