@@ -36,7 +36,8 @@ namespace ECommerceAPI.Controllers
             {
                 Username = registerModel.Username,
                 PasswordHash = passwordHash,
-                PasswordSalt = passwordSalt
+                PasswordSalt = passwordSalt,
+                Role = "User"
             };
 
             await _userRepository.AddUser(user);
@@ -55,7 +56,7 @@ namespace ECommerceAPI.Controllers
             {
                 new Claim(ClaimTypes.Name, user.Username)
             };
-            var token = GenerateJwtToken(user.Username);
+            var token = GenerateJwtToken(user.Username, user.Role);
             return Ok(new { token });
         }
 
@@ -86,11 +87,12 @@ namespace ECommerceAPI.Controllers
             }
         }
 
-        private string GenerateJwtToken(string username)
+        private string GenerateJwtToken(string username, string role)
         {
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, username)
+                new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.Role, role)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));

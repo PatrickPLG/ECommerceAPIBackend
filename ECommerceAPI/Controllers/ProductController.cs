@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ECommerceAPI.Models;
 using ECommerceAPI.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ECommerceAPI.Controllers
 {

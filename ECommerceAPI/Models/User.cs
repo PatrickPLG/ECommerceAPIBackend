@@ -15,5 +15,7 @@ namespace ECommerceAPI.Models
 
         [Required]
         public byte[] PasswordSalt { get; set; }
+        [Required]
+        public string Role { get; set; }
     }
 }

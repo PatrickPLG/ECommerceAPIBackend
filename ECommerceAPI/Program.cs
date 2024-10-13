@@ -88,12 +88,20 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
     app.ApplyMigrations();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await AdminUserSeeding.SeedAdminUser(services);
 }
 
 app.UseHttpsRedirection();
