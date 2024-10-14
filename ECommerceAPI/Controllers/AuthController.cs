@@ -54,7 +54,9 @@ namespace ECommerceAPI.Controllers
             // Generate claims
             Claim[] claims = new[]
             {
-                new Claim(ClaimTypes.Name, user.Username)
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Role, user.Role)
             };
             var token = GenerateJwtToken(user.Username, user.Role);
             return Ok(new { token });
