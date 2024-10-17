@@ -58,7 +58,8 @@ namespace ECommerceAPI.Controllers
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Role, user.Role)
             };
-            var token = GenerateJwtToken(user.Username, user.Role);
+
+            var token = GenerateJwtToken(claims);
             return Ok(new { token });
         }
 
@@ -89,14 +90,8 @@ namespace ECommerceAPI.Controllers
             }
         }
 
-        private string GenerateJwtToken(string username, string role)
+        private string GenerateJwtToken(Claim[] claims)
         {
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.Name, username),
-                new Claim(ClaimTypes.Role, role)
-            };
-
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
