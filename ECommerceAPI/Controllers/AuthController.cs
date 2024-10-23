@@ -48,8 +48,11 @@ namespace ECommerceAPI.Controllers
         public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
         {
             var user = await _userRepository.GetUserByUsername(loginModel.Username);
-            if (user == null || !VerifyPasswordHash(loginModel.Password, user.PasswordHash, user.PasswordSalt))
-                return Unauthorized("Invalid credentials");
+            if (user == null)
+                return NotFound(new { message = "User not registered" });
+
+            if (!VerifyPasswordHash(loginModel.Password, user.PasswordHash, user.PasswordSalt))
+                return Unauthorized(new { message = "Invalid credentials" });
 
             // Generate claims
             Claim[] claims = new[]
